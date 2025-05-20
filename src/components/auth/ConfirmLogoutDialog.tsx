@@ -22,7 +22,7 @@ export default function ConfirmLogoutDialog({ onConfirm }: ConfirmLogoutDialogPr
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <p className="flex items-center gap-2 cursor-pointer text-red-700">
+        <p className="flex items-center gap-2 cursor-pointer text-red-600">
           <LogOut />
           <span>Logout</span>
         </p>

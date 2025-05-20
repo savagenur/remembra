@@ -1,23 +1,23 @@
 "use client";
 import { Home, Inbox, Calendar, Search, Settings } from "lucide-react";
-import { routes } from "@/lib/routes";
+import { appRoutes } from "@/lib/routes";
 import { MenuItemModel } from "@/types/menuItem";
 
 export const menuItems: MenuItemModel[] = [
   {
     title: "People",
-    url: routes.people,
+    url: appRoutes.people,
     icon: Home,
   },
   {
     title: "Birthdays",
-    url: routes.birthdays,
+    url: appRoutes.birthdays,
     icon: Inbox,
   },
 
   {
     title: "Settings",
-    url: routes.settings,
+    url: appRoutes.settings,
     icon: Settings,
   },
 ];

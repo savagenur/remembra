@@ -1,5 +1,5 @@
 "use client";
-import { useAuthStore } from "@/stores/authstore";
+import { useAuthStore } from "@/stores/auth.store";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 
@@ -11,7 +11,6 @@ export const UseRequireAuth = () => {
 
   // Redirect authenticated users away from sign-in/sign-up pages
   useEffect(() => {
-    console.log("user: ",user);
     
     if (
       isInitialized &&

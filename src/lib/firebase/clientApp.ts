@@ -1,6 +1,7 @@
-import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider,signInWithPopup } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { initializeApp, getApps, getApp } from "firebase/app";
+import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -15,6 +16,7 @@ const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
 export const firebaseAuth = getAuth(app);
 export const firestore = getFirestore(app);
+export const firebaseStorage = getStorage(app);
 export const googleAuthProvider = new GoogleAuthProvider();
 
 export default app;

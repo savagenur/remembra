@@ -22,11 +22,12 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
-import { useAuthStore } from "@/stores/authstore";
+import { useAuthStore } from "@/stores/auth.store";
 import { AppSidebarProps } from "@/types/props";
 import { LogOut } from "lucide-react";
 import { usePathname } from "next/navigation";
 import ConfirmLogoutDialog from "./auth/ConfirmLogoutDialog";
+import { profilePlaceholder } from "@/config/constants";
 
 export function AppSidebar({ items }: AppSidebarProps) {
   const pathName = usePathname();
@@ -51,7 +52,7 @@ export function AppSidebar({ items }: AppSidebarProps) {
                   <img
                     src={
                       user?.photoURL ||
-                      "https://s3.eu-central-1.amazonaws.com/uploads.mangoweb.org/shared-prod/visegradfund.org/uploads/2021/08/placeholder-male.jpg"
+                      profilePlaceholder
                     }
                     alt="User Avatar"
                     width={40}

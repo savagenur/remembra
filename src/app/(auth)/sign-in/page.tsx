@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { useAuthStore } from "@/stores/authstore";
+import { useAuthStore } from "@/stores/auth.store";
 import { usePathname, useRouter } from "next/navigation";
 
 const SignInPage = () => {

@@ -1,5 +1,6 @@
+import { appRoutes } from "@/lib/routes";
 import { redirect } from "next/navigation";
 
 export default function Home() {
-  redirect("/people");
+  redirect(appRoutes.people);
 }

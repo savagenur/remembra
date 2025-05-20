@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthListener } from "@/stores/authListener";
 import { UseRequireAuth } from "@/hooks/useRequireAuth";
+import { PeopleSubscriber } from "@/stores/peopleSubscriber";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,7 +33,9 @@ export default function RootLayout({
       >
         <UseRequireAuth />
         <AuthListener />
+        <PeopleSubscriber />
         {children}
+        <Toaster />
       </body>
     </html>
   );
