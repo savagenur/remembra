@@ -133,10 +133,9 @@
   }
   
 }
-@layer components{
-  
+button {
+  @apply bg-zinc-800 text-white border border-zinc-700;
 }
-
 @utility menu-item {
   @apply text-base;
   color: var(--muted-color);

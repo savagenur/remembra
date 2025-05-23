@@ -64,20 +64,15 @@ export const usePeopleStore = create<PeopleStore>((set, get) => ({
   },
   updatePerson: async (data) => {
     const personRef = doc(firestore, "people", data.id!);
-    const personData = {
-      email: data.email,
-      phoneNumber: data.phoneNumber,
-      photoUrl: data.photoUrl,
-      firstName: data.firstName,
-      lastName: data.lastName,
-      description: data.description,
-      dateOfBirth: data.dateOfBirth,
-      status: data.status,
-    };
-    await updateDoc(personRef, {
-      ...personData,
-      updatedAt: serverTimestamp(),
-    });
+   
+    await setDoc(
+      personRef,
+      {
+        ...data,
+        updatedAt: serverTimestamp(),
+      },
+      { merge: true }
+    );
     console.log("Person updated!");
   },
   deletePerson: async (id) => {

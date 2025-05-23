@@ -2,8 +2,9 @@ import { UserModel } from "@/types/user";
 import { clsx, type ClassValue } from "clsx";
 import { format, parseISO } from "date-fns";
 import { User } from "firebase/auth";
+import { toast } from "sonner";
 import { twMerge } from "tailwind-merge";
-
+import {Info} from "lucide-react";
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -15,6 +16,12 @@ export function dateFromString(dateStr: string): Date {
   return new Date(dateStr);
 }
 export function convertToSafeDate(value: string): Date | null {
+  const [year, month, day] = value.split("-").map(Number);
+  const date = new Date(year, month - 1, day);
+  return isNaN(date.getTime()) ? null : date;
+}
+
+export function convertToDate(value: string): Date | null {
   const [year, month, day] = value.split("-").map(Number);
   const date = new Date(year, month - 1, day);
   return isNaN(date.getTime()) ? null : date;

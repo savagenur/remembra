@@ -17,6 +17,7 @@ import AppDropdownMenuItem from "../common/AppDropdownMenuItem";
 import { dropdownMenuItemClassName } from "@/config/constants";
 import { toast } from "sonner";
 import { appRoutes } from "@/lib/routes";
+import { successToast } from "../toast";
 
 const PersonMenuButton = ({ person }: { person: PersonModel | null }) => {
   const { deletePerson } = usePeopleStore();
@@ -35,18 +36,23 @@ const PersonMenuButton = ({ person }: { person: PersonModel | null }) => {
           <Menu />
         </DropdownMenuTrigger>
         {person && (
-          <DropdownMenuContent>
+          <DropdownMenuContent onEscapeKeyDown={(e) => e.preventDefault()}>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onSelect={
-              () => {
-                router.push(appRoutes.personEdit(person.id!))
-              }
-            }>Edit</DropdownMenuItem>
+            <DropdownMenuItem
+              onSelect={() => {
+                router.push(appRoutes.personEdit(person.id!));
+              }}
+            >
+              Edit
+            </DropdownMenuItem>
             <AppDialog
               title="Are you sure you want to delete this person?"
               trigger={
                 <div>
-                  <AppDropdownMenuItem title="Delete" className={"text-red-600"}/>
+                  <AppDropdownMenuItem
+                    title="Delete"
+                    className={"text-red-600"}
+                  />
                 </div>
               }
               confirmTitle="Delete"
@@ -54,7 +60,7 @@ const PersonMenuButton = ({ person }: { person: PersonModel | null }) => {
               onConfirm={async () => {
                 try {
                   await deletePerson(person!.id!);
-                  toast("Person deleted.")
+                  successToast("Person deleted.");
                   router.push("/people");
                 } catch (err) {
                   console.error("Failed to delete person:", err);

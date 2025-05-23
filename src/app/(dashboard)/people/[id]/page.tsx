@@ -4,7 +4,20 @@ import PersonMenuButton from "@/components/person/PersonMenuButton";
 import { profilePlaceholder } from "@/config/constants";
 import { formatDateFull, getContrastTextColor } from "@/lib/utils";
 import { usePersonStore } from "@/stores/person.store";
-import { FileText, Heart, Mail, PartyPopper, Phone } from "lucide-react";
+import {
+  Briefcase,
+  Circle,
+  FileText,
+  Hash,
+  Heart,
+  Layers,
+  Mail,
+  PartyPopper,
+  Phone,
+  Star,
+  Tag,
+  Workflow,
+} from "lucide-react";
 import { use, useEffect } from "react";
 
 const PersonDetailPage = ({ params }: { params: Promise<{ id: string }> }) => {
@@ -18,7 +31,7 @@ const PersonDetailPage = ({ params }: { params: Promise<{ id: string }> }) => {
   }, []);
   return (
     <div className="flex p-5  flex-col  w-full text-start">
-      <header className="flex pb-4  max-sm:flex-col gap-3  items-center  w-full   max-sm:justify-center">
+      <header className="flex pb-1  max-sm:flex-col gap-3  items-center  w-full   max-sm:justify-center">
         <div>
           <img
             src={person?.photoUrl ?? profilePlaceholder}
@@ -60,9 +73,25 @@ const PersonDetailPage = ({ params }: { params: Promise<{ id: string }> }) => {
           icon={PartyPopper}
           text={formatDateFull(person?.dateOfBirth as Date)}
         />
-        <PersonInfoTile label="Hobby" icon={Heart} />
+        <PersonInfoTile
+          label="Occupation"
+          icon={Briefcase}
+          text={person?.occupation}
+        />
       </div>
-      <div className="sm:pb-3" />
+      <hr className="my-3 border-gray-500 " />
+      {person?.customFields &&
+        person.customFields.map((field) => {
+          return (
+            <PersonInfoTile
+              className={"mb-3"}
+              key={field.key}
+              icon={Hash}
+              label={field.key}
+              text={field.value}
+            />
+          );
+        })}
       <PersonInfoTile
         label="Description"
         icon={FileText}

@@ -34,7 +34,7 @@ export default function AppDialog({
   description,
 }: AppDialogProps) {
   return (
-    <AlertDialog>
+    <AlertDialog >
       <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>

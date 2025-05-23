@@ -5,13 +5,15 @@ const PersonInfoTile = ({
   icon:Icon,
   label,
   text,
+  className,
 }: {
   icon: LucideIcon;
   label: string;
   text?: string | null;
+  className?:string|null,
 }) => {
   return (
-    <div className="border rounded-xl px-5 py-3 border-gray-600 max-sm:mb-3">
+    <div className={`border rounded-xl px-5 py-3 border-gray-600 max-sm:mb-3 ${className}`}>
       <div className="flex gap-5  items-center">
         <Icon className="text-green-700" />
         <div>

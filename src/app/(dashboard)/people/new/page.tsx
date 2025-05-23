@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { usePersonStore } from "@/stores/person.store";
 import { useEffect, useState } from "react";
+import DatePicker from "react-datepicker";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,11 +22,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { usePeopleStore } from "@/stores/people.store";
 import { convertToSafeDate, firebaseStoragePaths } from "@/lib/utils";
 import { toast } from "sonner";
-import { FileWarning, Info, StopCircle } from "lucide-react";
+import { Delete, FileWarning, Info, StopCircle, Trash } from "lucide-react";
 import { appRoutes } from "@/lib/routes";
 import EditableAvatar from "@/components/person/EditableAvatar";
 import { uploadFirebaseStoragePhoto } from "@/lib/firebase/storage";
 import { PersonModel } from "@/types/person";
+import { CustomField } from "@/types/customField";
+import { errorToast, infoToast, successToast } from "@/components/toast";
+import { colors } from "@/config/constants";
 
 export default function CreatePersonPage() {
   const router = useRouter();
@@ -33,6 +37,35 @@ export default function CreatePersonPage() {
   const { createPerson } = usePeopleStore();
   const user = useAuthStore((state) => state.user);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [customFields, setCustomFields] = useState<CustomField[]>([]);
+  const [dateOfBirth, setDateOfBirth] = useState<Date | null>(null);
+
+  const hasEmptyField = () => {
+    const isEmpty = customFields.some(
+      (field) => field.key.trim() === "" || field.value.trim() === ""
+    );
+    if (isEmpty) {
+      errorToast("Please fill in all existing custom fields.");
+      return true;
+    }
+    return false;
+  };
+  const handleAddField = () => {
+    if (hasEmptyField()) {
+      return;
+    }
+
+    setCustomFields([...customFields, { key: "", value: "" }]);
+  };
+  const handleFieldChange = (index: number, key: string, value: string) => {
+    const updated = [...customFields];
+    updated[index] = { ...updated[index], [key]: value };
+    setCustomFields(updated);
+  };
+  const handleFieldRemove = async (index: number) => {
+    const updated = customFields.filter((_, i) => i !== index);
+    setCustomFields(updated);
+  };
   useEffect(() => {
     resetPerson(); // clear store after submit
   }, []);
@@ -50,15 +83,18 @@ export default function CreatePersonPage() {
       );
       return url;
     } catch (error) {
-      toast("Something went wrong.");
+      infoToast("Something went wrong.");
       return null;
     }
   };
 
   const handleSubmit = async () => {
     if (person?.firstName && person.firstName.trim() !== "") {
+      if (hasEmptyField()) {
+        return;
+      }
       try {
-        let updatedPerson: PersonModel = person;
+        let updatedPerson: PersonModel = { ...person, customFields };
         let photoUrl = null;
         if (photoFile) {
           photoUrl = await uploadProfilePhoto(photoFile);
@@ -72,18 +108,13 @@ export default function CreatePersonPage() {
         }
 
         await createPerson(updatedPerson);
-        toast("Person created.");
+        successToast("Person created.");
         router.push(appRoutes.people);
       } catch (error) {
-        toast("Something went wrong!");
+        infoToast("Something went wrong!");
       }
     } else {
-      toast("First name is required.", {
-        style: {
-          color: "red",
-        },
-        icon: <Info />,
-      });
+      errorToast("First name is required.");
     }
   };
   const handleStatus = (status: PersonStatus) => {
@@ -122,6 +153,11 @@ export default function CreatePersonPage() {
           value={person?.email || ""}
           onChange={(e) => setPerson({ ...person, email: e.target.value })}
         />
+        <Input
+          placeholder="Occupation"
+          value={person?.occupation || ""}
+          onChange={(e) => setPerson({ ...person, occupation: e.target.value })}
+        />
 
         {
           <DropdownMenu>
@@ -159,23 +195,58 @@ export default function CreatePersonPage() {
             </DropdownMenuContent>
           </DropdownMenu>
         }
+        <Label className="ml-2 text-gray-300 mb-2" htmlFor="dob">
+          Date of birth
+        </Label>
+        <DatePicker
+          selected={dateOfBirth}
+          minDate={new Date("1950-01-01")}
+          maxDate={new Date()}
+          onChange={(date: Date | null) => {
+            setDateOfBirth(date);
+            setPerson({
+              ...person,
+              dateOfBirth: date ?? null,
+            });
+          }}
+          dateFormat="dd.MM.yyyy"
+          placeholderText="dd.MM.yyyy"
+          className="w-full bg-background border border-input rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background"
+          wrapperClassName="w-full"
+        />
 
-        <div className="">
-          <Label className="ml-2 text-gray-300 pb-2" htmlFor="dob">
-            Date of birth
-          </Label>
-          <Input
-            id="dob"
-            type="date"
-            onChange={(e) => {
-              const date = convertToSafeDate(e.target.value);
-              setPerson({
-                ...person,
-                dateOfBirth: e.target.value ? date : null,
-              });
-            }}
-          />
-        </div>
+        <hr className="border" />
+        <h1>Custom Fields</h1>
+        {customFields.map((field, index) => {
+          return (
+            <div key={index} className="flex gap-2 mb-2">
+              <Input
+                placeholder="Title"
+                autoFocus
+                value={field.key}
+                onChange={(e) =>
+                  handleFieldChange(index, "key", e.target.value)
+                }
+              />
+              <Input
+                placeholder="Value"
+                value={field.value}
+                onChange={(e) =>
+                  handleFieldChange(index, "value", e.target.value)
+                }
+              />
+              <Button
+                onClick={() => handleFieldRemove(index)}
+                style={{
+                  color: colors.red,
+                }}
+              >
+                <Trash />
+              </Button>
+            </div>
+          );
+        })}
+        <Button onClick={handleAddField}>+ Add field</Button>
 
         <Textarea
           placeholder="Description"
