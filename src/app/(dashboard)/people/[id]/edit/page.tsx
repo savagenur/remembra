@@ -61,7 +61,7 @@ export default function EditPersonPage({
         setCustomFields(person.customFields);
       }
     }
-  }, [person]);
+  }, [person?.customFields]);
   useEffect(() => {
     if (person?.dateOfBirth) {
       setDateOfBirth(person?.dateOfBirth as Date);
@@ -124,7 +124,7 @@ export default function EditPersonPage({
         if (photoFile) {
           photoUrl = await uploadProfilePhoto(photoFile);
           updatedPerson = {
-            ...person,
+            ...updatedPerson,
             photoUrl,
           };
         }
@@ -155,7 +155,7 @@ export default function EditPersonPage({
   };
 
   return (
-    <div className="flex flex-col w-full p-8 mx-auto md:min-w-3xl ">
+    <div className="flex flex-col w-full py-10 px-8 mx-auto md:min-w-3xl ">
       <h2 className="text-2xl font-bold mb-4">Edit Person</h2>
       <div className="flex max-sm:justify-center mb-4">
         <EditableAvatar

@@ -1,11 +1,7 @@
-import { firestore } from "@/lib/firebase/clientApp";
+import { firebaseAuth, firestore } from "@/lib/firebase/clientApp";
 import { PersonModel } from "@/types/person";
 import { PersonStatus } from "@/types/personStatus";
-import {
-  doc,
-  getDoc,
-  Timestamp
-} from "firebase/firestore";
+import { doc, getDoc, Timestamp } from "firebase/firestore";
 import { v4 } from "uuid";
 import { create } from "zustand";
 
@@ -41,10 +37,16 @@ export const usePersonStore = create<PersonStore>((set) => ({
       },
     });
   },
-  
+
   fetchPerson: async (id) => {
-    const docRef = doc(firestore, "people", id);
+    const user = firebaseAuth.currentUser;
+    if (!user) {
+      return;
+    }
+
+    const docRef = doc(firestore, "users", user.uid, "people", id);
     const docSnap = await getDoc(docRef);
+
     if (docSnap.exists()) {
       const data: PersonModel = docSnap.data();
       const dateOfBirth =
@@ -57,6 +59,8 @@ export const usePersonStore = create<PersonStore>((set) => ({
           dateOfBirth,
         },
       });
+    } else {
+      set({ person: null }); // or handle person not found
     }
   },
 }));

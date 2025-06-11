@@ -6,9 +6,11 @@ import {
 } from "@/lib/firebase/clientApp";
 import { UserModel } from "@/types/user";
 import {
+  createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
+  updateProfile,
   User,
 } from "firebase/auth";
 import {
@@ -33,6 +35,15 @@ type AuthStore = {
     email: string;
     password: string;
   }) => Promise<void>;
+  signUp: ({
+    name,
+    email,
+    password,
+  }: {
+    name: string;
+    email: string;
+    password: string;
+  }) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
 
   signOut: () => Promise<void>;
@@ -45,6 +56,56 @@ export const useAuthStore = create<AuthStore>()(
       loading: false,
       error: null,
       isInitialized: false,
+      signUp: async ({ name, email, password }) => {
+        set({ loading: true, error: null });
+        try {
+          // Create user with Firebase
+          const userCredential = await createUserWithEmailAndPassword(
+            firebaseAuth,
+            email,
+            password
+          );
+          const user = userCredential.user;
+
+          // ✅ Set display name in Firebase Auth
+          if (name) {
+            await updateProfile(user, { displayName: name });
+          }
+
+          // Check if user data exists in Firestore
+          const userRef = doc(firestore, "users", user.uid);
+          const userSnap = await getDoc(userRef);
+
+          let userData: UserModel;
+
+          if (!userSnap.exists()) {
+            // Create new user data
+            userData = {
+              uid: user.uid,
+              email: user.email || "",
+              displayName: name || null,
+              photoURL: user.photoURL || null,
+              createdAt: serverTimestamp(),
+              personStatuses: defaultStatuses,
+              phoneNumber: user.phoneNumber || null,
+            };
+
+            // Save to Firestore
+            await setDoc(userRef, userData);
+            console.log("✅ New user created in Firestore");
+          } else {
+            userData = userSnap.data() as UserModel;
+            console.log("📥 Existing user loaded from Firestore");
+          }
+
+          set({ user: userData });
+        } catch (err: any) {
+          console.error("❌ Sign up error:", err);
+          set({ error: err.message });
+        } finally {
+          set({ loading: false });
+        }
+      },
       signIn: async ({ email, password }) => {
         set({ loading: true, error: null });
         try {
@@ -87,7 +148,7 @@ export const useAuthStore = create<AuthStore>()(
             firebaseAuth,
             googleAuthProvider
           );
-          
+
           const user = result.user;
           const userRef = doc(firestore, "users", user.uid);
           const userSnap = await getDoc(userRef);
@@ -136,6 +197,11 @@ export const useAuthStore = create<AuthStore>()(
     }),
     {
       name: "auth-store",
+      partialize: (state) => ({
+        user: state.user,
+        error: state.error,
+        isInitialized: state.isInitialized,
+      }),
     }
   )
 );

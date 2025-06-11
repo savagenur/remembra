@@ -11,7 +11,9 @@ export default function Layout({
     <SidebarProvider>
       <AppSidebar items={menuItems} />
       <main className="w-full flex">
-        <SidebarTrigger hidden={false}/>
+        <div className="py-3 pl-1 absolute ">
+          <SidebarTrigger hidden={false} />
+        </div>
         {children}
       </main>
     </SidebarProvider>

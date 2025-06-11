@@ -28,6 +28,7 @@ import { LogOut } from "lucide-react";
 import { usePathname } from "next/navigation";
 import ConfirmLogoutDialog from "./auth/ConfirmLogoutDialog";
 import { profilePlaceholder } from "@/config/constants";
+import { appRoutes } from "@/lib/routes";
 
 export function AppSidebar({ items }: AppSidebarProps) {
   const pathName = usePathname();
@@ -50,10 +51,7 @@ export function AppSidebar({ items }: AppSidebarProps) {
               <div>
                 <div className="flex gap-3 items-center pb-3">
                   <img
-                    src={
-                      user?.photoURL ||
-                      profilePlaceholder
-                    }
+                    src={user?.photoURL || profilePlaceholder}
                     alt="User Avatar"
                     width={40}
                     height={40}
@@ -67,7 +65,10 @@ export function AppSidebar({ items }: AppSidebarProps) {
                 </div>
                 <SidebarMenu>
                   {items.map((item) => {
-                    const isActive = pathName === item.url;
+                    const isActive =
+                      pathName === item.url ||
+                      (item.url.startsWith(item.url) &&
+                        pathName.startsWith(`${item.url}/`));
                     return (
                       <SidebarMenuItem key={item.title}>
                         <SidebarMenuButton

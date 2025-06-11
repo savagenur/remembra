@@ -99,7 +99,7 @@ export default function CreatePersonPage() {
         if (photoFile) {
           photoUrl = await uploadProfilePhoto(photoFile);
           updatedPerson = {
-            ...person,
+            ...updatedPerson,
             photoUrl,
           };
         }

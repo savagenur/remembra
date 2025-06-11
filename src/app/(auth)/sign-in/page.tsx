@@ -1,41 +1,72 @@
 "use client";
+import GoogleIcon from "@/components/common/GoogleIcon";
+import { errorToast, successToast } from "@/components/toast";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { appRoutes } from "@/lib/routes";
 import { useAuthStore } from "@/stores/auth.store";
+import { Mail } from "lucide-react";
+import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
 
 const SignInPage = () => {
-  const { user, loading, error, signInWithGoogle } = useAuthStore();
+  const { user, loading, error, signInWithGoogle, signIn } = useAuthStore();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const router = useRouter();
   const pathname = usePathname();
 
-  const handleSignIn = async () => {
+  const handleSignInWithGoogle = async () => {
     await signInWithGoogle();
   };
-  return (
-    <div className="p-5 flex flex-col  justify-center items-center h-screen">
-      <h1 className="text-center text-4xl pb-4">Login with Google</h1>
-      {user ? (
-        <div className="flex gap-3 items-center ">
-          <img
-            width={50}
-            height={50}
-            className="border-r-[50%]"
-            src={user.photoURL || undefined}
-            alt="User Avatar"
-          />
+  const handleSignIn = async () => {
+    try {
+      await signIn({
+      email,
+      password,
+    });
+    successToast("Successfully signed in.")
+    } catch (error) {
+      errorToast(`${error}`)
+    }
+  };
+  
 
-          <h2>Welcome, {user.displayName}!</h2>
-        </div>
-      ) : (
-        <Button
-          className="w-[100%] md:w-[50%] "
-          onClick={handleSignIn}
-          disabled={loading}
-        >
-          {loading ? "Logging in..." : "Log in with Google "}
-        </Button>
-      )}
+  return (
+    <div className="p-5 gap-3 flex flex-col  justify-center items-center h-screen w-[100%] md:w-[50%] mx-auto">
+      <h1 className="text-center text-4xl ">Sign in</h1>
+      <Input
+        placeholder="Email"
+        value={email}
+        onChange={(e) => {
+          setEmail(e.target.value);
+        }}
+      />
+      <Input
+        placeholder="Password"
+        value={password}
+        type="password"
+        onChange={(e) => {
+          setPassword(e.target.value);
+        }}
+      />
+
+      <Button className="w-full" onClick={handleSignIn} disabled={loading}>
+        {loading ? "Signing in..." : "Sign in"}
+      </Button>
+      <Button
+        className="w-full bg-gray-300"
+        onClick={handleSignInWithGoogle}
+        disabled={loading}
+      >
+        <GoogleIcon className="w-10 h-10" />
+        <div >Continue with Google</div>
+      </Button>
       {error && <p style={{ color: "red" }}>{error}</p>}
+      <p>Don't have an account? <span className="font-semibold text-blue-500 cursor-pointer hover:text-blue-600"><Link href={appRoutes.signUp}>
+      Sign up.</Link></span></p> 
+
     </div>
   );
 };

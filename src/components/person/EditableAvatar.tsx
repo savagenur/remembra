@@ -53,7 +53,7 @@ export default function EditableAvatar({
         onClick={handleEditClick}
         className="absolute bottom-0 right-0 bg-white p-1 rounded-sm shadow-md hover:bg-gray-100 border-2 border-gray-600"
       >
-        <Edit className="w-4 h-4 text-gray-600" />
+        <Edit className="w-4 h-4" />
       </button>
 
       {/* Hidden File Input */}

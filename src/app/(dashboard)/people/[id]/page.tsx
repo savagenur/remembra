@@ -31,7 +31,7 @@ const PersonDetailPage = ({ params }: { params: Promise<{ id: string }> }) => {
   }, []);
   return (
     <div className="flex p-5  flex-col  w-full text-start">
-      <header className="flex pb-1  max-sm:flex-col gap-3  items-center  w-full   max-sm:justify-center">
+      <header className="flex pb-1  max-sm:flex-col gap-3 pl-5  items-center  w-full   max-sm:justify-center">
         <div>
           <img
             src={person?.photoUrl ?? profilePlaceholder}

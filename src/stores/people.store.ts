@@ -11,12 +11,15 @@ import {
   serverTimestamp,
   setDoc,
   Timestamp,
-  updateDoc,
 } from "firebase/firestore";
 import { create } from "zustand";
+import { useAuthStore } from "./auth.store";
+
 
 export type PeopleStore = {
   people: PersonModel[];
+  peopleBeforeToday: PersonModel[];
+  peopleAfterToday: PersonModel[];
   createPerson: (data: PersonModel) => Promise<void>;
   updatePerson: (data: PersonModel) => Promise<void>;
   deletePerson: (id: string) => Promise<void>;
@@ -27,44 +30,94 @@ export type PeopleStore = {
 
 export const usePeopleStore = create<PeopleStore>((set, get) => ({
   people: [],
+  peopleBeforeToday: [],
+  peopleAfterToday: [],
+
   subscribeToPeople: () => {
     get().unsubscribe?.();
-    const peopleRef = collection(firestore, "people");
+
+    const user = useAuthStore.getState().user;
+    if (!user) throw new Error("User not authenticated");
+
+    const peopleRef = collection(firestore, "users", user.uid, "people");
+
     const unsubscribe = onSnapshot(peopleRef, (snapshot) => {
-      const people: PersonModel[] = [];
+      const allPeople: PersonModel[] = [];
+
+      const today = new Date();
+      const todayMonth = today.getMonth();
+      const todayDate = today.getDate();
+
       snapshot.forEach((doc) => {
         const person = doc.data() as PersonModel;
         const dateOfBirth =
           person.dateOfBirth !== null
             ? (person.dateOfBirth as Timestamp).toDate()
             : null;
-        people.push({ ...person, dateOfBirth });
+
+        allPeople.push({ ...person, dateOfBirth });
       });
-      set({ people });
+
+      const beforeToday = allPeople.filter((p) => {
+        if (!p.dateOfBirth) return false;
+        const dob = p.dateOfBirth as Date;
+        const month = dob.getMonth();
+        const day = dob.getDate();
+        return month < todayMonth || (month === todayMonth && day < todayDate);
+      });
+
+      const afterToday = allPeople.filter((p) => {
+        if (!p.dateOfBirth) return false;
+        const dob = p.dateOfBirth as Date;
+        const month = dob.getMonth();
+        const day = dob.getDate();
+        return month > todayMonth || (month === todayMonth && day >= todayDate);
+      });
+
+      set({
+        people: allPeople,
+        peopleBeforeToday: beforeToday,
+        peopleAfterToday: afterToday,
+      });
     });
+
     set({ unsubscribe });
   },
+
   fetchPeople: async () => {
-    const snapshot = await getDocs(collection(firestore, "people"));
+    const user = useAuthStore.getState().user;
+    if (!user) throw new Error("User not authenticated");
+
+    const snapshot = await getDocs(
+      collection(firestore, "users", user.uid, "people")
+    );
     const people: PersonModel[] = [];
     snapshot.forEach((doc) => {
       people.push(doc.data() as PersonModel);
     });
     set({ people });
   },
+
   createPerson: async (data) => {
-    const personRef = doc(firestore, "people", data.id!);
+    const user = useAuthStore.getState().user;
+    if (!user) throw new Error("User not authenticated");
+
+    const personRef = doc(firestore, "users", user.uid, "people", data.id!);
 
     await setDoc(personRef, {
       ...data,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     });
-    console.log("Person created!");
+    console.log("✅ Person created");
   },
+
   updatePerson: async (data) => {
-    const personRef = doc(firestore, "people", data.id!);
-   
+    const user = useAuthStore.getState().user;
+    if (!user) throw new Error("User not authenticated");
+
+    const personRef = doc(firestore, "users", user.uid, "people", data.id!);
+
     await setDoc(
       personRef,
       {
@@ -73,12 +126,16 @@ export const usePeopleStore = create<PeopleStore>((set, get) => ({
       },
       { merge: true }
     );
-    console.log("Person updated!");
+    console.log("✅ Person updated");
   },
+
   deletePerson: async (id) => {
-    const personRef = doc(firestore, "people", id);
+    const user = useAuthStore.getState().user;
+    if (!user) throw new Error("User not authenticated");
+
+    const personRef = doc(firestore, "users", user.uid, "people", id);
     await deleteDoc(personRef);
     await deleteFirebaseStoragePhoto(firebaseStoragePaths.personProfile(id));
-    console.log("Person Deleted!");
+    console.log("🗑️ Person deleted");
   },
 }));
