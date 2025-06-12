@@ -29,6 +29,7 @@ import { usePathname } from "next/navigation";
 import ConfirmLogoutDialog from "./auth/ConfirmLogoutDialog";
 import { profilePlaceholder } from "@/config/constants";
 import { appRoutes } from "@/lib/routes";
+import Link from "next/link";
 
 export function AppSidebar({ items }: AppSidebarProps) {
   const pathName = usePathname();
@@ -78,10 +79,10 @@ export function AppSidebar({ items }: AppSidebarProps) {
                           })}
                           asChild
                         >
-                          <a href={item.url}>
+                          <Link href={item.url}>
                             <item.icon />
                             <span>{item.title}</span>
-                          </a>
+                          </Link>
                         </SidebarMenuButton>
                       </SidebarMenuItem>
                     );
