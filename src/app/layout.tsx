@@ -33,7 +33,6 @@ export default function RootLayout({
       >
         <UseRequireAuth />
         <AuthListener />
-        <PeopleSubscriber />
         {children}
         <Toaster />
       </body>

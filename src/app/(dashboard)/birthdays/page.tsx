@@ -4,7 +4,7 @@ import FloatingActionButton from "@/components/common/FloatingActionButton";
 import PersonTile from "@/components/common/PersonTile";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { appRoutes } from "@/lib/routes";
-import { formatDateOfBirth } from "@/lib/utils";
+import { cn, formatDateOfBirth } from "@/lib/utils";
 import { usePeopleStore } from "@/stores/people.store";
 import { Plus } from "lucide-react";
 import Link from "next/link";
@@ -51,12 +51,12 @@ const BirthdaysPage = () => {
           {/* Centered Tab List */}
           <div className="flex justify-center">
             <TabsList className="w-[400px] justify-center">
-              <TabsTrigger value={birthdayTabs.active}>Active</TabsTrigger>
+              <TabsTrigger  value={birthdayTabs.active}>Active</TabsTrigger>
               <TabsTrigger value={birthdayTabs.archive}>Archive</TabsTrigger>
             </TabsList>
           </div>
           {/* Full-Width Content */}
-          <TabsContent value="active" className="mt-4 w-full">
+          <TabsContent value={birthdayTabs.active} className="mt-4 w-full">
             <div className="w-full flex flex-col  p-4 gap-2">
               {peopleAfterToday.map((person) => {
                 return (
@@ -72,7 +72,7 @@ const BirthdaysPage = () => {
               })}
             </div>
           </TabsContent>
-          <TabsContent value="archive" className="mt-4 w-full">
+          <TabsContent value={birthdayTabs.archive} className="mt-4 w-full">
             <div className="w-full flex flex-col  p-4 gap-2">
               {peopleBeforeToday.map((person) => {
                 return (

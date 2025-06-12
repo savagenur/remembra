@@ -22,6 +22,7 @@ import {
 } from "firebase/firestore";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { usePeopleStore } from "./people.store";
 type AuthStore = {
   user: UserModel | null;
   loading: boolean;
@@ -137,6 +138,7 @@ export const useAuthStore = create<AuthStore>()(
           set({ user: userData });
         } catch (err: any) {
           set({ error: err.message });
+          throw err;
         } finally {
           set({ loading: false });
         }
@@ -184,6 +186,12 @@ export const useAuthStore = create<AuthStore>()(
         set({ loading: true });
         try {
           await signOut(firebaseAuth);
+          usePeopleStore.setState({
+            people: [],
+            peopleBeforeToday: [],
+            peopleAfterToday: [],
+          });
+          localStorage.removeItem("auth-store");
           set({ user: null });
         } catch (err: any) {
           set({ error: err.message });
